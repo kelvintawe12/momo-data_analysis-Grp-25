@@ -278,8 +278,11 @@
         margin: 1rem;
       }
     }
+    .dashboard-title {
+      font-size: 1.5rem;
+    }
   </style>
-</head>
+    <h1 class="dashboard-title"><i class="fas fa-sms"></i> SMS Dashboard</h1>
 <body>
   <header>
     <h1 style="font-size: 1.5rem;"><i class="fas fa-sms"></i> SMS Dashboard</h1>
@@ -292,13 +295,14 @@
   <main>
     <section id="filter">
       <input type="text" id="search" placeholder="Search..." />
-      <select id="transactionType">
+      <select id="transactionType" title="Select transaction type">
         <option value="">All Types</option>
         <option value="Incoming">Incoming</option>
         <option value="Payments">Payments</option>
       </select>
-      <input type="date" id="dateFilter" />
-      <select id="statusFilter">
+      <label for="dateFilter">Date:</label>
+      <input type="date" id="dateFilter" title="Select a date" />
+      <select id="statusFilter" title="Select a status">
         <option value="">All Statuses</option>
         <option value="Completed">Completed</option>
         <option value="Pending">Pending</option>
