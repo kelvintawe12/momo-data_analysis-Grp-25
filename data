@@ -1,0 +1,9 @@
+import csv
+
+# Replace 'your_file.csv' with the name of your CSV file
+file_path = 'your_file.csv'
+
+with open(file_path, mode='r') as file:
+    csv_reader = csv.reader(file)
+    for row in csv_reader:
+        print(row)

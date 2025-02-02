@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced SMS Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    /* CSS Variables */
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --background: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #2b2d42;
+      --positive: #10b981;
+      --negative: #ef4444;
+      /* MTN colours */
+      --mtn-primary: #fcd116;  /* MTN Yellow */
+      --mtn-secondary: #000000;  /* MTN Black */
+      --transition-speed: 0.3s;
+    }
+
+    [data-theme="dark"] {
+      --background: #1a1a1a;
+      --card-bg: #2d2d2d;
+      --text-color: #ffffff;
+    }
+
+    /* Global reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--text-color);
+      font-size: 0.9rem;
+      overflow-x: hidden;
+    }
+
+    /* Keyframes for animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: slideIn 0.5s ease-out;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .export-btn {
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 5px;
+      background: var(--secondary-color);
+      color: white;
+      cursor: pointer;
+      transition: background var(--transition-speed);
+    }
+
+    .export-btn:hover {
+      background: var(--primary-color);
+    }
+
+    /* Filter Section */
+    #filter {
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    #filter input,
+    #filter select {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: border var(--transition-speed);
+    }
+
+    #filter input:focus,
+    #filter select:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      padding: 0 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .mini-chart-container {
+      background: var(--card-bg);
+      padding: 0.5rem;
+      border-radius: 8px;
+      width: 100%;
+      height: 120px;
+      position: relative;
+      cursor: pointer;
+      transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .mini-chart-container:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 2;
+    }
+
+    .mini-chart {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--negative);
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 2s infinite;
+    }
+
+    /* Transaction Details */
+    #transactionDetails {
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 0 2rem 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .transaction-card {
+      padding: 0.5rem;
+      border-bottom: 1px solid #eee;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .transaction-card.header {
+      font-weight: bold;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 5px;
+    }
+
+    /* Spending Habits Section */
+    #spendingSection {
+      margin: 2rem;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    #spendingSection h2 {
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+
+    #spendingSection canvas {
+      width: 100% !important;
+      height: 300px !important;
+    }
+
+    /* Detailed Spending Section */
+    #detailedSpendingSection {
+      margin: 2rem;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    #detailedSpendingSection h2 {
+      margin-bottom: 1rem;
+      color: var(--secondary-color);
+    }
+
+    #detailedSpendingSection canvas {
+      width: 100% !important;
+      height: 300px !important;
+    }
+
+    /* MTN Section */
+    #mtnSection {
+      margin: 2rem;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    #mtnSection h2 {
+      margin-bottom: 1rem;
+      color: var(--mtn-secondary);
+    }
+
+    #mtnSection canvas {
+      width: 100% !important;
+      height: 300px !important;
+    }
+
+    /* Scrollbar styling */
+    #transactionDetails::-webkit-scrollbar {
+      width: 8px;
+    }
+    #transactionDetails::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+      }
+      .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      }
+      #filter, #transactionDetails, #spendingSection, #detailedSpendingSection, #mtnSection {
+        margin: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="font-size: 1.5rem;"><i class="fas fa-sms"></i> SMS Dashboard</h1>
+    <div class="header-controls">
+      <button class="export-btn" id="exportCsv"><i class="fas fa-file-csv"></i> Export CSV</button>
+      <button class="export-btn" id="themeToggle"><i class="fas fa-moon"></i> Toggle Theme</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="filter">
+      <input type="text" id="search" placeholder="Search..." />
+      <select id="transactionType">
+        <option value="">All Types</option>
+        <option value="Incoming">Incoming</option>
+        <option value="Payments">Payments</option>
+      </select>
+      <input type="date" id="dateFilter" />
+      <select id="statusFilter">
+        <option value="">All Statuses</option>
+        <option value="Completed">Completed</option>
+        <option value="Pending">Pending</option>
+      </select>
+    </section>
+
+    <div class="dashboard-grid">
+      <div class="mini-chart-container">
+        <div class="notification-badge" id="pendingBadge">0</div>
+        <canvas class="mini-chart" id="mainChart"></canvas>
+      </div>
+      <div class="mini-chart-container">
+        <canvas class="mini-chart" id="volumeChart"></canvas>
+      </div>
+      <div class="mini-chart-container">
+        <canvas class="mini-chart" id="trendChart"></canvas>
+      </div>
+      <div class="mini-chart-container">
+        <canvas class="mini-chart" id="statusChart"></canvas>
+      </div>
+    </div>
+
+    <section id="transactionDetails">
+      <div class="transaction-card header">
+        <div>Type</div>
+        <div>Amount</div>
+        <div>Date</div>
+        <div>Status</div>
+      </div>
+      <div id="transactionsList"></div>
+    </section>
+
+    <!-- Spending Habits Section -->
+    <section id="spendingSection">
+      <h2>Spending Habits</h2>
+      <canvas id="spendingChart"></canvas>
+    </section>
+
+    <!-- Detailed Spending Trends Section -->
+    <section id="detailedSpendingSection">
+      <h2>Detailed Spending Trends</h2>
+      <canvas id="detailedSpendingChart"></canvas>
+    </section>
+
+    <!-- MTN Section -->
+    <section id="mtnSection">
+      <h2>MTN Transaction Trends</h2>
+      <canvas id="mtnChart"></canvas>
+    </section>
+  </main>
+
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Generate sample data with an extra 'provider' field (MTN or Vodacom)
+    let transactions = Array.from({ length: 200 }, (_, i) => ({
+      id: i + 1,
+      type: i % 2 === 0 ? 'Incoming' : 'Payments',
+      amount: (Math.random() * 2000 - 500).toFixed(2),
+      date: new Date(Date.now() - Math.random() * 31536000000).toISOString().split('T')[0],
+      status: ['Completed', 'Pending'][i % 2],
+      provider: Math.random() > 0.5 ? 'MTN' : 'Vodacom'
+    }));
+
+    // Chart configuration for simple charts
+    const basicChartConfig = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: true } },
+      scales: { x: { display: false }, y: { display: false } }
+    };
+
+    // Helper to get CSS variables for charts
+    function getCssVar(variableName) {
+      return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+    }
+
+    // Initialize charts container
+    let charts = {};
+
+    function initCharts() {
+      charts.main = new Chart(document.getElementById('mainChart'), {
+        type: 'bar',
+        data: getMainChartData(),
+        options: basicChartConfig
+      });
+
+      charts.volume = new Chart(document.getElementById('volumeChart'), {
+        type: 'line',
+        data: getVolumeData(),
+        options: basicChartConfig
+      });
+
+      charts.trend = new Chart(document.getElementById('trendChart'), {
+        type: 'doughnut',
+        data: getTrendData(),
+        options: basicChartConfig
+      });
+
+      charts.status = new Chart(document.getElementById('statusChart'), {
+        type: 'pie',
+        data: getStatusData(),
+        options: basicChartConfig
+      });
+
+      // MTN Chart: Scatter chart plotting MTN transactions.
+      charts.mtn = new Chart(document.getElementById('mtnChart'), {
+        type: 'scatter',
+        data: getMTNChartData(),
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: {
+              type: 'linear',
+              position: 'bottom',
+              title: { display: true, text: 'Amount', color: getCssVar('--mtn-secondary') },
+              grid: { color: 'rgba(0,0,0,0.1)' }
+            },
+            y: {
+              type: 'time',
+              time: { unit: 'month' },
+              title: { display: true, text: 'Date', color: getCssVar('--mtn-secondary') },
+              grid: { color: 'rgba(0,0,0,0.1)' }
+            }
+          }
+        }
+      });
+
+      // Spending Habits Chart: Bar chart grouping spending by month.
+      charts.spending = new Chart(document.getElementById('spendingChart'), {
+        type: 'bar',
+        data: getSpendingHabitsData(),
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { 
+            legend: { display: false },
+            tooltip: { enabled: true }
+          },
+          scales: {
+            x: {
+              title: { display: true, text: 'Month' },
+              grid: { color: 'rgba(0,0,0,0.1)' }
+            },
+            y: {
+              title: { display: true, text: 'Total Spent' },
+              grid: { color: 'rgba(0,0,0,0.1)' }
+            }
+          }
+        }
+      });
+
+      // Detailed Spending Trends Chart: Line chart grouping spending by exact date.
+      charts.detailedSpending = new Chart(document.getElementById('detailedSpendingChart'), {
+        type: 'line',
+        data: getDetailedSpendingData(),
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { 
+            legend: { display: false },
+            tooltip: { enabled: true }
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: { unit: 'day', displayFormats: { day: 'MMM dd' } },
+              title: { display: true, text: 'Date' },
+              grid: { color: 'rgba(0,0,0,0.1)' }
+            },
+            y: {
+              title: { display: true, text: 'Total Spent ($)' },
+              grid: { color: 'rgba(0,0,0,0.1)' }
+            }
+          }
+        }
+      });
+    }
+
+    // Data functions for existing charts
+    function getMainChartData() {
+      return {
+        labels: ['In', 'Out'],
+        datasets: [{
+          data: [
+            transactions.filter(t => t.amount > 0).length,
+            transactions.filter(t => t.amount < 0).length
+          ],
+          backgroundColor: [getCssVar('--positive'), getCssVar('--negative')]
+        }]
+      };
+    }
+
+    function getVolumeData() {
+      // Generate random data for volume chart
+      return {
+        labels: Array.from({ length: 7 }, (_, i) => `Day ${i + 1}`),
+        datasets: [{
+          data: Array.from({ length: 7 }, () => Math.floor(Math.random() * 50 + 10)),
+          borderColor: getCssVar('--primary-color'),
+          borderWidth: 2,
+          fill: false,
+          tension: 0.3
+        }]
+      };
+    }
+
+    function getTrendData() {
+      // Random data for trend chart
+      return {
+        labels: ['Up', 'Down', 'Stable'],
+        datasets: [{
+          data: [Math.floor(Math.random() * 50), Math.floor(Math.random() * 50), Math.floor(Math.random() * 50)],
+          backgroundColor: [getCssVar('--positive'), getCssVar('--negative'), getCssVar('--secondary-color')]
+        }]
+      };
+    }
+
+    function getStatusData() {
+      const statusCounts = transactions.reduce((acc, t) => {
+        acc[t.status] = (acc[t.status] || 0) + 1;
+        return acc;
+      }, {});
+      return {
+        labels: Object.keys(statusCounts),
+        datasets: [{
+          data: Object.values(statusCounts),
+          backgroundColor: [getCssVar('--primary-color'), getCssVar('--secondary-color')]
+        }]
+      };
+    }
+
+    // New function for MTN chart data (scatter chart)
+    function getMTNChartData() {
+      // Filter transactions for provider 'MTN'
+      const mtnTransactions = transactions.filter(t => t.provider === 'MTN');
+      const dataPoints = mtnTransactions.map(t => ({
+        x: parseFloat(t.amount),
+        y: new Date(t.date)
+      }));
+      return {
+        datasets: [{
+          label: 'MTN Transactions',
+          data: dataPoints,
+          backgroundColor: getCssVar('--mtn-primary'),
+          borderColor: getCssVar('--mtn-secondary'),
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          showLine: false
+        }]
+      };
+    }
+
+    // New function for Spending Habits data (bar chart grouped by month)
+    function getSpendingHabitsData() {
+      // Group transactions by month (YYYY-MM) where amount is negative (spent)
+      const monthlySpending = {};
+      transactions.forEach(t => {
+        if (parseFloat(t.amount) < 0) {
+          const month = t.date.substring(0, 7);
+          if (!monthlySpending[month]) {
+            monthlySpending[month] = 0;
+          }
+          monthlySpending[month] += Math.abs(parseFloat(t.amount));
+        }
+      });
+
+      const labels = Object.keys(monthlySpending).sort();
+      const data = labels.map(label => monthlySpending[label]);
+
+      const backgroundColors = labels.map((_, index) => {
+        const hue = Math.round((index * 360) / labels.length);
+        return `hsl(${hue}, 70%, 60%)`;
+      });
+
+      return {
+        labels,
+        datasets: [{
+          label: 'Spending Habits',
+          data,
+          backgroundColor: backgroundColors,
+          borderWidth: 1,
+          borderColor: '#fff'
+        }]
+      };
+    }
+
+    // New function for Detailed Spending Trends data (line chart grouped by day)
+    function getDetailedSpendingData() {
+      // Group spending transactions (negative amounts) by day (YYYY-MM-DD)
+      const dailySpending = {};
+      transactions.forEach(t => {
+        if (parseFloat(t.amount) < 0) {
+          const day = t.date; // date is already in YYYY-MM-DD format
+          if (!dailySpending[day]) {
+            dailySpending[day] = 0;
+          }
+          dailySpending[day] += Math.abs(parseFloat(t.amount));
+        }
+      });
+
+      // Create an array of data points sorted by date
+      const sortedDays = Object.keys(dailySpending).sort();
+      const dataPoints = sortedDays.map(day => ({
+        x: new Date(day),
+        y: dailySpending[day]
+      }));
+
+      return {
+        datasets: [{
+          label: 'Daily Spending',
+          data: dataPoints,
+          borderColor: getCssVar('--negative'),
+          backgroundColor: 'rgba(239, 68, 68, 0.3)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3
+        }]
+      };
+    }
+
+    // Update functions
+    function updateAll() {
+      charts.main.data = getMainChartData();
+      charts.volume.data = getVolumeData();
+      charts.trend.data = getTrendData();
+      charts.status.data = getStatusData();
+      charts.mtn.data = getMTNChartData();
+      charts.spending.data = getSpendingHabitsData();
+      charts.detailedSpending.data = getDetailedSpendingData();
+      
+      charts.main.update();
+      charts.volume.update();
+      charts.trend.update();
+      charts.status.update();
+      charts.mtn.update();
+      charts.spending.update();
+      charts.detailedSpending.update();
+      
+      updateTransactionList();
+      updatePendingBadge();
+    }
+
+    // Filter functions
+    function applyFilters() {
+      const searchTerm = document.getElementById('search').value.toLowerCase();
+      const typeFilter = document.getElementById('transactionType').value;
+      const dateFilter = document.getElementById('dateFilter').value;
+      const statusFilter = document.getElementById('statusFilter').value;
+
+      const filtered = transactions.filter(t => {
+        return (
+          (!searchTerm ||
+            t.type.toLowerCase().includes(searchTerm) ||
+            t.amount.toString().includes(searchTerm) ||
+            t.date.includes(searchTerm)) &&
+          (!typeFilter || t.type === typeFilter) &&
+          (!dateFilter || t.date >= dateFilter) &&
+          (!statusFilter || t.status === statusFilter)
+        );
+      });
+
+      updateTransactionList(filtered);
+      updatePendingBadge(filtered);
+    }
+
+    // Update transaction list
+    function updateTransactionList(filteredTransactions = transactions) {
+      const listEl = document.getElementById('transactionsList');
+      listEl.innerHTML = '';
+      filteredTransactions.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'transaction-card';
+        card.innerHTML = `
+          <div>${t.type}</div>
+          <div>${t.amount}</div>
+          <div>${t.date}</div>
+          <div>${t.status} (${t.provider})</div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    // Update Pending Badge
+    function updatePendingBadge(filteredTransactions = transactions) {
+      const pendingCount = filteredTransactions.filter(t => t.status === 'Pending').length;
+      document.getElementById('pendingBadge').textContent = pendingCount;
+    }
+
+    // Event Listeners for filters
+    document.getElementById('search').addEventListener('input', applyFilters);
+    document.getElementById('transactionType').addEventListener('change', applyFilters);
+    document.getElementById('dateFilter').addEventListener('change', applyFilters);
+    document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+    // Export function
+    document.getElementById('exportCsv').addEventListener('click', () => {
+      const csvContent = [
+        ['Type', 'Amount', 'Date', 'Status', 'Provider'],
+        ...transactions.map(t => [t.type, t.amount, t.date, t.status, t.provider])
+      ]
+        .map(e => e.join(','))
+        .join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'transactions.csv';
+      a.click();
+    });
+
+    // Theme toggle
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      document.body.setAttribute(
+        'data-theme',
+        document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+      );
+    });
+
+    // Initial setup
+    initCharts();
+    updateAll();
+  </script>
+</body>
+</html>
