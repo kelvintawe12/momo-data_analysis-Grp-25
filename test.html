@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Advanced SMS Dashboard</title>
+    <style src="test.js"></style>
+    <!-- link to scripts.js -->
+    <script src="scripts.js"></script>
+    <!-- link to styles.css -->
+    <link rel="stylesheet" href="test.css" />
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -318,8 +324,6 @@
         </select>
         <!-- <label for="dateFilter">Date:</label> -->
         <input type="date" id="dateFilter" title="Select a date" />
-
-        <input type="date" id="dateFilter" title="Select a date" />
         <select id="statusFilter" title="Filter by status">
           <option value="">All Statuses</option>
           <option value="Completed">Completed</option>
@@ -353,53 +357,192 @@
         <div id="transactionsList"></div>
       </section>
 
-      <!-- New Spending Habits Section -->
+      <!-- New Spending Habits Section-->
       <section id="spendingSection">
         <h2>Spending Habits</h2>
         <canvas id="spendingChart"></canvas>
       </section>
-      <!-- Add these new sections below the detailed spending analysis -->
-      <section id="financialHealth">
-        <h2>Financial Health Overview</h2>
-        <div class="health-metrics">
-          <div class="metric-card">
-            <h3>Net Balance</h3>
-            <div class="metric-value" id="netBalance">$0.00</div>
-            <div class="metric-trend">
-              <i class="fas fa-arrow-up trend-positive"></i>
-              <span>+2.3% from last month</span>
-            </div>
-          </div>
-
-          <div class="metric-card">
-              <div class="progress-fill width-30"></div>
-            <div class="metric-value" id="savingsRate">0%</div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: 30%"></div>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <h3>Debt Ratio</h3>
-            <div class="metric-value" id="debtRatio">0:1</div>
-            <canvas id="debtChart"></canvas>
-          </div>
+      <!-- Add these new sections spendding -->
+<style>
+  #geographicalAnalysis {
+    position: relative;
+    background-image: url('world-map.svg');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .country-highlight {
+    fill: #ff4757;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+  }
+  
+  .country-highlight:hover {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  
+  .rating-system {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .rating-star {
+    color: #ffd700;
+    font-size: 1.2rem;
+  }
+  
+  .financial-rating {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    padding: 1rem;
+    border-radius: 8px;
+    color: white;
+  }
+  </style>
+  
+  <!-- Updated Financial Health Section -->
+  <section id="financialHealth">
+    <h2>Financial Health Overview</h2>
+    <div class="health-metrics">
+      <div class="metric-card">
+        <h3>Net Balance</h3>
+        <div class="metric-value" id="netBalance">$100.00</div>
+        <div class="metric-trend">
+          <i class="fas fa-arrow-up trend-positive"></i>
+          <span>+2.3% from last month</span>
         </div>
-      </section>
-
-      <section id="geographicalAnalysis">
-        <h2>Geographical Spending</h2>
-        <div class="geo-grid">
-          <div class="map-container">
-            <canvas id="heatmap"></canvas>
-          </div>
-          <div class="region-breakdown">
-            <h3>Top Spending Regions</h3>
-            <div id="regionList"></div>
-          </div>
+      </div>
+      
+      <div class="metric-card financial-rating">
+        <h3>Spending Rating</h3>
+        <div class="rating-system" id="spendingRating">
+          <i class="fas fa-star rating-star"></i>
+          <i class="fas fa-star rating-star"></i>
+          <i class="fas fa-star rating-star"></i>
+          <i class="fas fa-star rating-star"></i>
+          <i class="fas fa-star rating-star"></i>
         </div>
-      </section>
-
+        <div id="ratingText">Excellent Financial Health</div>
+      </div>
+  
+      <div class="metric-card">
+        <h3>Debt Ratio</h3>
+        <div class="metric-value" id="debtRatio">0:1</div>
+        <canvas id="debtChart"></canvas>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Geographical Analysis Section with SVG Map -->
+  <section id="geographical-analysis">
+    <h2>Geographical Spending</h2>
+    <div class="geo-grid">
+      <!-- SVG Map Container -->
+      <div class="map-container">
+        <svg id="world-map" width="100%" height="100%" viewBox="0 0 1000 800" aria-labelledby="mapTitle">
+          <title id="mapTitle">East Africa Spending Map</title>
+          <!-- Placeholder SVG Paths for the four countries; update the "d" attributes with actual path data -->
+          <path id="RW" class="country-path" data-country="Rwanda" d="M150,500 L190,480 L210,520 L170,540 Z" />
+          <path id="ET" class="country-path" data-country="Ethiopia" d="M350,300 L400,280 L430,320 L380,340 Z" />
+          <path id="KE" class="country-path" data-country="Kenya" d="M600,500 L640,480 L660,520 L620,540 Z" />
+          <path id="UG" class="country-path" data-country="Uganda" d="M480,450 L520,430 L540,470 L500,490 Z" />
+        </svg>
+      </div>
+      <!-- Region Breakdown Panel -->
+      <div class="region-breakdown">
+        <h3>Top Spending Regions</h3>
+        <ul id="region-list">
+          <!-- Example entries (can be populated dynamically) -->
+          <li><strong>Kenya:</strong> $12,345</li>
+          <li><strong>Uganda:</strong> $10,678</li>
+          <li><strong>Ethiopia:</strong> $9,876</li>
+          <li><strong>Rwanda:</strong> $8,765</li>
+        </ul>
+      </div>
+    </div>
+  </section>  
+  <script>
+  // Financial Rating Calculator
+  function calculateFinancialRating() {
+    const netBalance = parseFloat(document.getElementById('netBalance').textContent.replace('$',''));
+    const savingsRate = parseFloat(document.getElementById('savingsRate').textContent.replace('%',''));
+    const debtRatio = parseFloat(document.getElementById('debtRatio').textContent.split(':')[0]);
+  
+    // Rating weights
+    const balanceWeight = 0.4;
+    const savingsWeight = 0.3;
+    const debtWeight = 0.3;
+  
+    // Normalize values
+    const balanceScore = Math.min(netBalance / 5000, 1) * 5;
+    const savingsScore = (savingsRate / 20) * 5;
+    const debtScore = (1 - Math.min(debtRatio, 1)) * 5;
+  
+    const totalScore = 
+      (balanceScore * balanceWeight) +
+      (savingsScore * savingsWeight) +
+      (debtScore * debtWeight);
+  
+    updateRatingDisplay(totalScore);
+  }
+  
+  function updateRatingDisplay(score) {
+    const stars = document.querySelectorAll('.rating-star');
+    const ratingText = document.getElementById('ratingText');
+    
+    stars.forEach((star, index) => {
+      star.style.color = index < Math.round(score) ? '#ffd700' : '#d3d3d3';
+    });
+  
+    const ratings = [
+      { threshold: 4, text: 'Excellent Financial Health', color: '#2ecc71' },
+      { threshold: 3, text: 'Good Financial Health', color: '#3498db' },
+      { threshold: 2, text: 'Fair Financial Health', color: '#f1c40f' },
+      { threshold: 0, text: 'Needs Improvement', color: '#e74c3c' }
+    ];
+  
+    const currentRating = ratings.find(r => score >= r.threshold);
+    ratingText.textContent = currentRating.text;
+    ratingText.style.color = currentRating.color;
+  }
+  
+  // World Map Visualization
+  async function initWorldMap() {
+    // Load SVG map data (you need to provide actual SVG paths)
+    const response = await fetch('world-map.svg');
+    const svgData = await response.text();
+    document.getElementById('worldMap').innerHTML = svgData;
+  
+    // Highlight countries with transactions
+    const countriesWithTransactions = ['UG', 'KE', 'NG']; // Example country codes
+    countriesWithTransactions.forEach(code => {
+      const countryPath = document.getElementById(code);
+      if (countryPath) {
+        countryPath.classList.add('country-highlight');
+        countryPath.addEventListener('click', () => {
+          showCountrySpendingDetails(code);
+        });
+      }
+    });
+  }
+  
+  function showCountrySpendingDetails(countryCode) {
+    const countrySpending = transactions.filter(t => 
+      t.region === countryCode.toUpperCase()
+    ).reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  
+    alert(`Total spending in ${countryCode}: $${countrySpending.toFixed(2)}`);
+  }
+  
+  // Initialize after data load
+  function updateAll() {
+    calculateFinancialRating();
+    initWorldMap();
+    // ... rest of your existing update code
+  }
+  </script>
       <style>
         /* New styles */
         #financialHealth {
