@@ -384,20 +384,9 @@
           </div>
         </div>
       </section>
-
-      <section id="geographicalAnalysis">
-        <h2>Geographical Spending</h2>
-        <div class="geo-grid">
-          <div class="map-container">
-            <canvas id="heatmap"></canvas>
-          </div>
-          <div class="region-breakdown">
-            <h3>Top Spending Regions</h3>
-            <div id="regionList"></div>
-          </div>
-        </div>
-      </section>
-
+      <!-- begin -->
+        
+      <!-- end -->
       <style>
         /* New styles */
         #financialHealth {
@@ -640,11 +629,96 @@
           charts.debt.update();
         }
       </script>
-      <!-- MTN Section (Existing example) -->
-      <section id="mtnSection">
-        <h2>MTN Transaction Trends</h2>
-        <canvas id="mtnChart"></canvas>
-      </section>
+      <!-- Add Chart.js CDN in your head section -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+     <section id="mtnSection">
+     <h2>MTN Transaction Trends</h2>
+     <canvas id="mtnChart"></canvas>
+    </section>
+
+      <!-- Add Chart.js CDN in your head section -->
+
+<script>
+  // Get the canvas element
+  const ctx = document.getElementById('mtnChart').getContext('2d');
+
+  // Chart configuration
+  new Chart(ctx, {
+    type: 'line', // Choose line chart for trends
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      datasets: [{
+        label: 'Mobile Money Transactions',
+        data: [12, 19, 15, 25, 22, 30, 35, 40, 37, 45, 50, 60],
+        borderColor: '#FFD700', // MTN Yellow
+        backgroundColor: 'rgba(255, 215, 0, 0.2)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 5,
+        pointHoverRadius: 7
+      },
+      {
+        label: 'Airtime Sales',
+        data: [8, 12, 10, 15, 18, 20, 25, 28, 24, 30, 35, 40],
+        borderColor: '#FF0000', // MTN Red
+        backgroundColor: 'rgba(255, 0, 0, 0.2)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 5,
+        pointHoverRadius: 7
+      },
+      {
+        label: 'Data Bundles',
+        data: [5, 8, 6, 10, 12, 15, 18, 20, 22, 25, 28, 35],
+        borderColor: '#000080', // Navy Blue
+        backgroundColor: 'rgba(0, 0, 128, 0.2)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 5,
+        pointHoverRadius: 7
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Monthly Transaction Volume (2024-2025)',
+          font: { size: 16 }
+        },
+        legend: {
+          position: 'top',
+          labels: { font: { size: 14 } }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Transactions (in thousands)',
+            font: { size: 14 }
+          },
+          grid: { color: 'rgba(0,0,0,0.1)' }
+        },
+        x: {
+          grid: { display: false },
+          title: {
+            display: true,
+            text: 'Months',
+            font: { size: 14 }
+          }
+        }
+      },
+      interaction: {
+        mode: 'nearest',
+        intersect: false
+      }
+    }
+  });
+</script>
     </main>
 
     <!-- Chart.js Library -->

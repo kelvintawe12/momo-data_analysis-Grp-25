@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <section id="geographicalAnalysis">
+      <h2>East Africa Spending Analysis</h2>
+      <div class="geo-grid">
+        <div class="map-container">
+          <div id="map" style="height: 500px"></div>
+        </div>
+        <div class="region-breakdown">
+          <h3>Top Spending Countries</h3>
+          <div id="regionList"></div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      // East Africa Countries Data
+      const geoData = {
+        regions: [
+          {
+            name: "Rwanda",
+            lat: -1.9403,
+            lng: 29.8739,
+            value: 45,
+            amount: "$4.5M",
+          },
+          {
+            name: "Uganda",
+            lat: 0.3476,
+            lng: 32.5825,
+            value: 38,
+            amount: "$3.8M",
+          },
+          {
+            name: "Ethiopia",
+            lat: 8.9806,
+            lng: 38.7578,
+            value: 55,
+            amount: "$5.5M",
+          },
+          {
+            name: "Kenya",
+            lat: -1.2864,
+            lng: 36.8172,
+            value: 60,
+            amount: "$6.0M",
+          },
+          {
+            name: "Tanzania",
+            lat: -6.7924,
+            lng: 39.2083,
+            value: 42,
+            amount: "$4.2M",
+          },
+        ],
+      };
+
+      // Initialize map centered on East Africa
+      const map = L.map("map").setView([1.3733, 32.2903], 6); // Centered on Uganda with zoom level 6
+
+      // Add detailed tile layer
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors",
+        maxZoom: 9,
+      }).addTo(map);
+
+      // Create heatmap layer
+      const heatPoints = geoData.regions.map((country) => [
+        country.lat,
+        country.lng,
+        country.value,
+      ]);
+
+      const heatLayer = L.heatLayer(heatPoints, {
+        radius: 25,
+        blur: 20,
+        maxZoom: 8,
+        gradient: {
+          0.4: "#ffd700", // Yellow
+          0.65: "#ffa500", // Orange
+          1: "#ff0000", // Red
+        },
+      }).addTo(map);
+      // Add country boundaries layer
+      L.geoJson(countryBoundaries, {
+        style: {
+          color: "#555",
+          weight: 1,
+          fillOpacity: 0.1,
+        },
+      }).addTo(map);
+      // Add country markers with custom icons
+      const customIcon = L.icon({
+        iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+        iconSize: [25, 25],
+      });
+
+      geoData.regions.forEach((country) => {
+        L.marker([country.lat, country.lng], { icon: customIcon }).addTo(map)
+          .bindPopup(`
+            <b>${country.name}</b><br>
+            Total Transactions: ${country.amount}<br>
+            Activity Index: ${country.value}/100
+          `);
+      });
+
+      // Country List Builder with interactive features
+      const regionList = document.getElementById("regionList");
+      geoData.regions
+        .sort((a, b) => b.value - a.value)
+        .forEach((country, index) => {
+          const item = document.createElement("div");
+          item.className = "region-item";
+          item.innerHTML = `
+          <div>
+            <strong>${index + 1}.</strong> ${country.name}
+            <div class="progress-bar">
+              <div class="progress-fill" 
+                   style="width: ${(country.value / 60) * 100}%">
+              </div>
+            </div>
+          </div>
+          <div>${country.amount}</div>
+        `;
+
+          // Add click interaction
+          item.addEventListener("click", () => {
+            map.flyTo([country.lat, country.lng], 7);
+            heatLayer.setLatLngs([[country.lat, country.lng, country.value]]);
+          });
+
+          regionList.appendChild(item);
+        });
+    </script>
+
+    <style>
+      /* Custom East Africa styling */
+      .geo-grid {
+        grid-template-columns: 2fr 1fr;
+      }
+
+      .map-container {
+        border: 2px solid #e0e0e0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .region-item {
+        padding: 1rem;
+        margin: 0.75rem 0;
+        background: linear-gradient(to right, #f8f9fa 50%, #ffffff 50%);
+        border-left: 4px solid #ff0000;
+        transition: all 0.3s ease;
+      }
+
+      .region-item:hover {
+        transform: translateX(10px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .progress-fill {
+        background: linear-gradient(90deg, #ffd700, #ff0000);
+        border-radius: 4px;
+      }
+    </style>
+  </body>
+</html>

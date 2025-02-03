@@ -237,13 +237,13 @@
       }
 
       #spendingSection h2 {
-        margin-bottom: 1rem;
+        margin-bottom: 2rem;
         color: var(--primary-color);
       }
 
       #spendingSection canvas {
         width: 100% !important;
-        height: 300px !important;
+        height: 90px !important;
       }
 
       /* MTN Section */
@@ -367,12 +367,18 @@
             <div class="summary-value" id="totalSpent">$12000.00</div>
           </div>
           <div class="summary-item">
-            <h3>Average Monthly Spend</h3>
+            <h3>Average Monthly Spend : <br></h3>
             <div class="summary-value" id="avgMonthlySpend">$300.00</div>
           </div>
           <div class="summary-item">
-            <h3>Highest Amount spent in a Month</h3>
+            <h3>Highest Amount spent in a Month : <br></h3>
             <div class="summary-value" id="highestSpendingMonth">$450.00</div>
+          </div>
+
+          <div class="summary-item">
+            <h3>Total Amt received : <br></h3>
+            <div class="summary-value" 
+          id="highestSpendingMonth">$2000.00</div>
           </div>
         </div>
         <canvas id="spendingChart"></canvas>
@@ -479,17 +485,10 @@
           <i class="fas fa-arrow-up trend-positive"></i>
           <span>+2.3% from last month</span>
         </div>
-      </div>
-      
-      <div class="metric-card financial-rating">
-        <h3>Spending Rating</h3>
-        <div class="rating-system" id="spendingRating">
-          <i class="fas fa-star rating-star"></i>
-          <i class="fas fa-star rating-star"></i>
-          <i class="fas fa-star rating-star"></i>
-          <i class="fas fa-star rating-star"></i>
-          <i class="fas fa-star rating-star"></i>
-        </div>
+            </div>
+            
+            <div class="metric-card financial-rating">
+        <h3>Spending Rating </h3> 
         <div id="ratingText">Excellent Financial Health</div>
       </div>
   
@@ -498,37 +497,141 @@
         <div class="metric-value" id="debtRatio">0:1</div>
         <canvas id="debtChart"></canvas>
       </div>
-    </div>
-  </section>
-  
-  <!-- Geographical Analysis Section with SVG Map -->
-  <section id="geographical-analysis">
-    <h2>Geographical Spending</h2>
-    <div class="geo-grid">
-      <!-- SVG Map Container -->
-      <div class="map-container">
-        <svg id="world-map" width="100%" height="100%" viewBox="0 0 1000 800" aria-labelledby="mapTitle">
-          <title id="mapTitle">East Africa Spending Map</title>
-          <!-- Placeholder SVG Paths for the four countries; update the "d" attributes with actual path data -->
-          <path id="RW" class="country-path" data-country="Rwanda" d="M150,500 L190,480 L210,520 L170,540 Z" />
-          <path id="ET" class="country-path" data-country="Ethiopia" d="M350,300 L400,280 L430,320 L380,340 Z" />
-          <path id="KE" class="country-path" data-country="Kenya" d="M600,500 L640,480 L660,520 L620,540 Z" />
-          <path id="UG" class="country-path" data-country="Uganda" d="M480,450 L520,430 L540,470 L500,490 Z" />
-        </svg>
-      </div>
-      <!-- Region Breakdown Panel -->
-      <div class="region-breakdown">
-        <h3>Top Spending Regions</h3>
-        <ul id="region-list">
-          <!-- Example entries (can be populated dynamically) -->
-          <li><strong>Kenya:</strong> $12,345</li>
-          <li><strong>Uganda:</strong> $10,678</li>
-          <li><strong>Ethiopia:</strong> $9,876</li>
-          <li><strong>Rwanda:</strong> $8,765</li>
-        </ul>
-      </div>
-    </div>
-  </section>  
+        </div>
+      </section>
+      
+      <!-- Geographical Analysis Section with SVG Map -->
+      <section id="geographicalAnalysis">
+        <h2>Geographical Spending</h2>
+        <div class="geo-grid">
+          <div class="map-container">
+            <canvas id="heatmap"></canvas>
+          </div>
+          <div class="region-breakdown">
+            <h3>Top Spending Regions</h3>
+            <div id="regionList"></div>
+          </div>
+        </div>
+      </section>
+      
+      <style>
+      .geo-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-top: 1.5rem;
+      }
+      
+      .map-container {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      
+      .region-breakdown {
+        background: #fff;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      
+      .region-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem;
+        margin: 0.5rem 0;
+        background: #f8f9fa;
+        border-radius: 4px;
+      }
+      
+      .progress-bar {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ffd700, #ff0000);
+        transition: width 0.5s ease;
+      }
+      </style>
+      
+      <script>
+      // Heatmap Data
+      const geoData = {
+        regions: [
+          { x: 10, y: 20, value: 40, name: 'Greater Accra' },
+          { x: 30, y: 40, value: 35, name: 'Ashanti' },
+          { x: 50, y: 60, value: 30, name: 'Eastern' },
+          { x: 70, y: 80, value: 25, name: 'Central' },
+          { x: 90, y: 10, value: 20, name: 'Western' },
+        ],
+        topRegions: [
+          { name: 'Greater Accra', amount: '₵4.2M' },
+          { name: 'Ashanti', amount: '₵3.8M' },
+          { name: 'Eastern', amount: '₵2.9M' },
+          { name: 'Central', amount: '₵2.1M' },
+          { name: 'Western', amount: '₵1.7M' },
+        ]
+      };
+      
+      // Heatmap Chart
+      new Chart(document.getElementById('heatmap'), {
+        type: 'bubble',
+        data: {
+          datasets: [{
+            label: 'Spending Intensity',
+            data: geoData.regions,
+            backgroundColor: 'rgba(255, 0, 0, 0.4)',
+            borderColor: 'rgba(255, 0, 0, 0.7)',
+            borderWidth: 1,
+            hoverBackgroundColor: 'rgba(255, 0, 0, 0.6)',
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const region = ctx.raw;
+                  return `${region.name}: ₵${region.value}0K`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: { display: false },
+            y: { display: false }
+          },
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const region = geoData.regions[elements[0].index];
+              console.log('Selected region:', region.name);
+            }
+          }
+        }
+      });
+      
+      // Region List Builder
+      const regionList = document.getElementById('regionList');
+      geoData.topRegions.forEach((region, index) => {
+        const item = document.createElement('div');
+        item.className = 'region-item';
+        item.innerHTML = `
+          <div>
+            <strong>${index + 1}.</strong> ${region.name}
+          </div>
+          <div>${region.amount}</div>
+        `;
+        regionList.appendChild(item);
+      });
+      </script>
   <script>
   // Financial Rating Calculator
   function calculateFinancialRating() {
@@ -852,10 +955,94 @@
         }
       </script>
       <!-- MTN Section (Existing example) -->
-      <section id="mtnSection">
-        <h2>MTN Transaction Trends</h2>
-        <canvas id="mtnChart"></canvas>
-      </section>
+       <!-- Add Chart.js CDN in your head section -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<section id="mtnSection">
+  <h2>MTN Transaction Trends</h2>
+  <canvas id="mtnChart"></canvas>
+</section>
+
+<script>
+  // Get the canvas element
+  const ctx = document.getElementById('mtnChart').getContext('2d');
+
+  // Chart configuration
+  new Chart(ctx, {
+    type: 'line', // Choose line chart for trends
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      datasets: [{
+        label: 'Mobile Money Transactions',
+        data: [12, 19, 15, 25, 22, 30, 35, 40, 37, 45, 50, 60],
+        borderColor: '#FFD700', // MTN Yellow
+        backgroundColor: 'rgba(255, 215, 0, 0.2)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 5,
+        pointHoverRadius: 7
+      },
+      {
+        label: 'Airtime Sales',
+        data: [8, 12, 10, 15, 18, 20, 25, 28, 24, 30, 35, 40],
+        borderColor: '#FF0000', // MTN Red
+        backgroundColor: 'rgba(255, 0, 0, 0.2)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 5,
+        pointHoverRadius: 7
+      },
+      {
+        label: 'Data Bundles',
+        data: [5, 8, 6, 10, 12, 15, 18, 20, 22, 25, 28, 35],
+        borderColor: '#000080', // Navy Blue
+        backgroundColor: 'rgba(0, 0, 128, 0.2)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 5,
+        pointHoverRadius: 7
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Monthly Transaction Volume (2023)',
+          font: { size: 16 }
+        },
+        legend: {
+          position: 'top',
+          labels: { font: { size: 14 } }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Transactions (in millions)',
+            font: { size: 14 }
+          },
+          grid: { color: 'rgba(0,0,0,0.1)' }
+        },
+        x: {
+          grid: { display: false },
+          title: {
+            display: true,
+            text: 'Months',
+            font: { size: 14 }
+          }
+        }
+      },
+      interaction: {
+        mode: 'nearest',
+        intersect: false
+      }
+    }
+  });
+</script>
     </main>
 
     <!-- Chart.js Library -->
