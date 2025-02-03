@@ -322,7 +322,7 @@
           <option value="Incoming">Incoming</option>
           <option value="Payments">Payments</option>
         </select>
-        <!-- <label for="dateFilter">Date:</label> -->
+        <!-- something-->
         <input type="date" id="dateFilter" title="Select a date" />
         <select id="statusFilter" title="Filter by status">
           <option value="">All Statuses</option>
@@ -360,6 +360,72 @@
       <!-- New Spending Habits Section-->
       <section id="spendingSection">
         <h2>Spending Habits</h2>
+        <div class="spending-summary">
+          <div class="summary-item">
+            
+            <h3>Total Amt Spent : <br></h3>
+            <div class="summary-value" id="totalSpent">$12000.00</div>
+          </div>
+          <div class="summary-item">
+            <h3>Average Monthly Spend</h3>
+            <div class="summary-value" id="avgMonthlySpend">$300.00</div>
+          </div>
+          <div class="summary-item">
+            <h3>Highest Amount spent in a Month</h3>
+            <div class="summary-value" id="highestSpendingMonth">$450.00</div>
+          </div>
+        </div>
+        <canvas id="spendingChart"></canvas>
+        <style>
+          .spending-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+          }
+          .summary-item {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+          }
+          .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+          }
+        </style>
+        <script>
+          function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            const minTimer = 50;
+            const stepTime = Math.abs(Math.floor(duration / range));
+
+            let startTime = new Date().getTime();
+            let endTime = startTime + duration;
+            let timer;
+
+            function run() {
+              const now = new Date().getTime();
+              const remaining = Math.max((endTime - now) / duration, 0);
+              const value = Math.round(end - remaining * range);
+              obj.textContent = `$${value.toFixed(2)}`;
+              if (value == end) {
+                clearInterval(timer);
+              }
+            }
+
+            timer = setInterval(run, stepTime);
+            run();
+          }
+
+          document.addEventListener("DOMContentLoaded", () => {
+            animateValue("totalSpent", 0, parseFloat(document.getElementById("totalSpent").textContent.replace('$', '')), 3000);
+            animateValue("avgMonthlySpend", 0, parseFloat(document.getElementById("avgMonthlySpend").textContent.replace('$', '')), 3000);
+            animateValue("highestSpendingMonth", 0, parseFloat(document.getElementById("highestSpendingMonth").textContent.replace('$', '')), 3000);
+          });
+        </script>
         <canvas id="spendingChart"></canvas>
       </section>
       <!-- Add these new sections spendding -->
